@@ -16,6 +16,8 @@
 
 package de.larma.arthook;
 
+import java.lang.reflect.Method;
+
 public final class Native {
 
     static {
@@ -38,6 +40,8 @@ public final class Native {
     public static native boolean munprotect(long addr, long len);
 
     public static native void ptrace(int pid);
+
+    public static native Object doOriginal(Object obj, Object clazz, Method mid, Object... args);
 
     private static Boolean sixtyFour;
 

@@ -69,7 +69,9 @@ public class ArtMethod {
             throw new RuntimeException("Can't create new ArtMethod, is this a system running Art?", e);
         }
     }
-
+    /*
+        associatedMethod has type java.lang.reflect, artMethod has type ArtMethod
+     */
     private ArtMethod(Object associatedMethod, Object artMethod) {
         this.artMethod = Assertions.argumentNotNull(artMethod, "artMethod");
         this.associatedMethod = associatedMethod;

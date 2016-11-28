@@ -21,7 +21,7 @@
 #include <unistd.h>
 #include <sys/ptrace.h>
 
-#define LOGV(...)  ((void)__android_log_print(ANDROID_LOG_VERBOSE, "ArtHook_native", __VA_ARGS__))
+#define LOGV(...)  ((void)__android_log_print(ANDROID_LOG_VERBOSE, "ArtHook.native", __VA_ARGS__))
 
 JNIEXPORT jboolean JNICALL Java_de_larma_arthook_Native_munprotect(JNIEnv *env, jclass _cls, jlong addr, jlong len) {
     int pagesize = sysconf(_SC_PAGESIZE);
@@ -87,4 +87,24 @@ JNIEXPORT jboolean JNICALL Java_de_larma_arthook_Native_munmap(JNIEnv *env, jcla
 
 JNIEXPORT void JNICALL Java_de_larma_arthook_Native_ptrace(JNIEnv* env, jclass _cls, jint pid) {
     ptrace(PTRACE_ATTACH,(pid_t)pid,0,0);
+}
+
+JNIEXPORT jobject JNICALL
+Java_de_larma_arthook_Native_doOriginal(JNIEnv *env, jclass type, jobject obj, jobject clazz, jobject mid,
+                                        jobjectArray args) {
+
+    unsigned int *asd = mid;
+    jvalue * _args;
+    jint length,i;
+
+    length = (*env)->GetArrayLength(env, args);
+    _args = malloc(length * sizeof(jvalue));
+    for (i = 0; i < length; i++) {
+        _args[i].l = (*env)->GetObjectArrayElement(env, args, i);
+    }
+    // TODO
+    LOGV("length: %d \n", length);
+    LOGV("obj: %x, clazz %p, mid %p \n", *asd, clazz, *asd);
+    return (*env)->CallStaticObjectMethodA(env, clazz, mid, _args);
+
 }

@@ -2,9 +2,12 @@ package de.larma.arthook.test;
 
 import android.app.Activity;
 import android.net.sip.SipAudioCall;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.lang.reflect.Method;
 
 public class MyActivity extends Activity {
 
@@ -14,6 +17,16 @@ public class MyActivity extends Activity {
     protected void onResume() {
         super.onResume();
         try {
+            TelephonyManager tm = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+            String imei = tm.getDeviceId();
+            Log.d(TAG, "imei:" + imei);
+            Base b = new Base();
+            b.id();
+            SpecialBase sb = new SpecialBase();
+            Method m = sb.getClass().getDeclaredMethod("id");
+            m.invoke(sb,null);
+            //sb.id();
+
             Log.d(TAG, "setContentView(" + Integer.toHexString(R.layout.activity_my) + ");");
             setContentView(R.layout.activity_my);
             //Activity.class.getDeclaredMethod("setContentView", int.class).invoke(this, R.layout.activity_my);

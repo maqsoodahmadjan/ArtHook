@@ -24,7 +24,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import static de.larma.arthook.ArtHook.findTargetMethod;
+import static de.larma.arthook.ArtHook.findOriginalMethod;
 
 public class OriginalMethod {
     private static final String TAG = "ArtHook.OriginalMethod";
@@ -39,8 +39,15 @@ public class OriginalMethod {
 
     @SuppressWarnings("unchecked")
     public <T> T invoke(Object receiver, Object... args) {
+        if(receiver == null){
+            Log.d(TAG, "receiver NULLL");
+        }
+        Log.d(TAG,"method: " + method);
+        Log.d(TAG, "receiver:" + receiver);
+        Log.d(TAG,"args: " + args);
         try {
             return (T) method.invoke(receiver, args);
+            //return (T) Native.doOriginal(receiver, receiver, method, args);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Calling original method failed", e);
         } catch (InvocationTargetException e) {
@@ -67,7 +74,7 @@ public class OriginalMethod {
 
     public static OriginalMethod byHook(Method hook) {
         try {
-            return byOriginal(findTargetMethod(hook));
+            return byOriginal(findOriginalMethod(hook));
         } catch (Exception e) {
             throw new RuntimeException("must be called with a hook method", e);
         }

@@ -50,11 +50,11 @@ public class Arm32 extends InstructionHelper {
                 0x14, (byte) 0xc0, (byte) 0x9f, (byte) 0xe5,    // ldr ip, [pc, #20]
                 0x0c, 0x00, 0x50, (byte) 0xe1,                  // cmp r0, ip
                 0x04, 0x00, 0x00, 0x1a,                         // bne next
-                0x00, 0x00, (byte) 0x9f, (byte) 0xe5,           // ldr r0, [pc, #4]
-                0x04, (byte) 0xf0, (byte) 0x9f, (byte) 0xe5,    // ldr pc, [pc, #4]
+                0x00, 0x00, (byte) 0x9f, (byte) 0xe5,           // ldr r0, [pc, #0]
+                0x04, (byte) 0xf0, (byte) 0x9f, (byte) 0xe5,    // ldr pc, [pc, #0]
+                0x0, 0x0, 0x0, 0x0,                             // target_method_pos
                 0x0, 0x0, 0x0, 0x0,                             // target_method_pc
-                0x0, 0x0, 0x0, 0x0,                             // src_method_pos_x
-                0x0, 0x0, 0x0, 0x0,                             // target_method_pos_x
+                0x0, 0x0, 0x0, 0x0,                             // src_method_pos
         };
         writeInt((int) hook.target.getAddress(), ByteOrder.LITTLE_ENDIAN, instructions,
                 instructions.length - 12);

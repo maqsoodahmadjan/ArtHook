@@ -57,6 +57,10 @@ public final class ArtHook {
         }
     }
 
+    /*
+        Create an HookPage with trampoline for original to replacement
+
+     */
     private static HookPage handleHookPage(ArtMethod original, ArtMethod replacement) {
         long originalEntryPoint = INSTRUCTION_SET_HELPER.toMem(
                 original.getEntryPointFromQuickCompiledCode());
@@ -70,7 +74,10 @@ public final class ArtHook {
         page.update();
         return page;
     }
-
+    /*
+        External function called to start hooking
+        For each method (target) in clazz with a valid Assertion Hook.class it calls hook(method)
+     */
     public static void hook(Class clazz) {
         for (Method method : Assertions.argumentNotNull(clazz, "clazz").getDeclaredMethods()) {
             if (method.isAnnotationPresent(Hook.class)) {
@@ -83,13 +90,17 @@ public final class ArtHook {
         }
     }
 
+    /*
+        get original method calling findOriginalMethod
+        call next hook function
+     */
     public static OriginalMethod hook(Method method) {
         if (!method.isAnnotationPresent(Hook.class))
             throw new IllegalArgumentException("method must have @Hook annotation");
 
         Object original;
         try {
-            original = findTargetMethod(method);
+            original = findOriginalMethod(method);
         } catch (Throwable e) {
             throw new RuntimeException("Can't find original method (" + method.getName() + ")", e);
         }
@@ -99,11 +110,17 @@ public final class ArtHook {
         }
         return hook(original, method, ident);
     }
-
+    /*
+        just casting function
+     */
     public static OriginalMethod hook(Method originalMethod, Method replacementMethod, String backupIdentifier) {
         return hook((Object) originalMethod, replacementMethod, backupIdentifier);
     }
-
+    /*
+        real hook starting
+        first get an Artmethod calling next hook function
+        then store original and backup calling OriginalMethod.store()
+     */
     public static OriginalMethod hook(Object originalMethod, Method replacementMethod, String backupIdentifier) {
         ArtMethod backArt;
         if (originalMethod instanceof Method) {
@@ -121,7 +138,9 @@ public final class ArtHook {
 
         return new OriginalMethod(backupMethod);
     }
-
+    /*
+        just checks and casting to ArtMethod function
+     */
     public static ArtMethod hook(Method originalMethod, Method replacementMethod) {
         Assertions.argumentNotNull(originalMethod, "originalMethod");
         Assertions.argumentNotNull(replacementMethod, "replacementMethod");
@@ -141,7 +160,12 @@ public final class ArtHook {
 
         return hook(ArtMethod.of(originalMethod), ArtMethod.of(replacementMethod));
     }
-
+    /*
+        finally real hooking function
+        first create an HookPage, then clone the original and make the resulting copy private.
+        finally write the address of page (where the trampoline is stored) into
+        original's entrypointfrometc... field
+     */
     private static ArtMethod hook(ArtMethod original, ArtMethod replacement) {
         HookPage page = handleHookPage(original, replacement);
         ArtMethod backArt = original.clone();
@@ -164,13 +188,13 @@ public final class ArtHook {
         return ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).getInt();
     }
 
-    static Object findTargetMethod(Method method) throws NoSuchMethodException, ClassNotFoundException {
+    static Object findOriginalMethod(Method method) throws NoSuchMethodException, ClassNotFoundException {
         Hook hook = method.getAnnotation(Hook.class);
         String[] split = hook.value().split("->");
-        return findTargetMethod(method, Class.forName(split[0]), split.length == 1 ? method.getName() : split[1]);
+        return findOriginalMethod(method, Class.forName(split[0]), split.length == 1 ? method.getName() : split[1]);
     }
 
-    private static Object findTargetMethod(Method method, Class<?> targetClass, String methodName)
+    private static Object findOriginalMethod(Method method, Class<?> targetClass, String methodName)
             throws NoSuchMethodException {
         Class<?>[] params = null;
         if (method.getParameterTypes().length > 0) {
