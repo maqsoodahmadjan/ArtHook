@@ -39,12 +39,14 @@ public class OriginalMethod {
 
     @SuppressWarnings("unchecked")
     public <T> T invoke(Object receiver, Object... args) {
+        /*
         if(receiver == null){
             Log.d(TAG, "receiver NULLL");
         }
         Log.d(TAG,"method: " + method);
         Log.d(TAG, "receiver:" + receiver);
         Log.d(TAG,"args: " + args);
+        */
         try {
             return (T) method.invoke(receiver, args);
             //return (T) Native.doOriginal(receiver, receiver, method, args);
@@ -99,7 +101,7 @@ public class OriginalMethod {
                 for (Method method : cls.getDeclaredMethods()) {
                     if (method.getName().equals(element.getMethodName()) &&
                             method.isAnnotationPresent(Hook.class)) {
-                        Log.d(TAG, "Calling method hooked by " + method + " as original");
+                        //Log.d(TAG, "Calling method hooked by " + method + " as original");
                         return byHook(method);
                     }
                 }

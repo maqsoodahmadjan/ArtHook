@@ -26,17 +26,16 @@ public class Hooks {
 
     //public native Object invoke(Object var1, Object... var2) throws IllegalAccessException,
     // IllegalArgumentException, InvocationTargetException;
-    /*
+
     @Hook("java.lang.reflect.Method->invoke")
     @BackupIdentifier("Method_invoke")
-    public static Object Method_invoke(Object thiz, Object var1, Object... var2)
+    public static Object Method_invoke(Object var1, Object... var2)
     {
         Log.d(TAG, "fixed Method invoke()");
-        return null;
-        //return OriginalMethod.by("Method_invoke").invoke(thiz,var1,var2);
+        return OriginalMethod.by("Method_invoke").invokeStatic(var1,var2);
         //        ("Method_invoke").invoke(thiz,var1,var2);
 
-    }*/
+    }
     /*
     @Hook("de.larma.arthook.test.SpecialBase->id")
     public static void fix_SpecialBase(Object o) {

@@ -16,6 +16,9 @@
 
 package de.larma.arthook;
 
+import android.util.Log;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -35,6 +38,7 @@ import static de.larma.arthook.DebugHelper.logw;
 public final class ArtHook {
     private static final Map<Long, HookPage> pages = new HashMap<>();
     private static InstructionHelper INSTRUCTION_SET_HELPER;
+    private static final String TAG = "ArtHook";
 
     private ArtHook() {
     }
@@ -196,22 +200,32 @@ public final class ArtHook {
 
     private static Object findOriginalMethod(Method method, Class<?> targetClass, String methodName)
             throws NoSuchMethodException {
+        logd("looking for method: " + methodName + " in class: " + targetClass.getName());
+        logd("method is static: " + Modifier.isStatic(method.getModifiers()));
+        logd("method is native: " + Modifier.isNative(method.getModifiers()));
         Class<?>[] params = null;
         if (method.getParameterTypes().length > 0) {
+            for(Class<?> x : method.getParameterTypes())
+                logd("param type: " + x.getName());
             params = new Class<?>[method.getParameterTypes().length - 1];
             System.arraycopy(method.getParameterTypes(), 1, params, 0, method.getParameterTypes().length - 1);
+
         }
         if (methodName.equals("()") || methodName.equals("<init>")) {
             // Constructor
             return targetClass.getConstructor(params);
         }
         try {
+            logd("getting1 declaredmethod: " + methodName);
             Method m = targetClass.getDeclaredMethod(methodName, method.getParameterTypes());
+            logd("got method: " + m);
             if (Modifier.isStatic(m.getModifiers())) return m;
         } catch (NoSuchMethodException ignored) {
         }
         try {
+            logd("getting2 declaredmethod: " + methodName);
             Method m = targetClass.getDeclaredMethod(methodName, params);
+            logd("got method: " + m);
             if (!Modifier.isStatic(m.getModifiers())) return m;
         } catch (NoSuchMethodException ignored) {
         }
